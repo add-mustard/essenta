@@ -39,22 +39,14 @@ endforeach;
 $offices = $offices->posts;
 $google_maps_api_key = essenta_get_google_maps_api_key();
 
-if ($office_locations && $google_maps_api_key !== '') {
-    wp_enqueue_script(
-        'essenta-google-maps',
-        add_query_arg(
-            array(
-                'key' => $google_maps_api_key,
-                'callback' => 'essentaInitOfficeMaps',
-                'loading' => 'async',
-            ),
-            'https://maps.googleapis.com/maps/api/js'
-        ),
-        array('main-script'),
-        null,
-        true
-    );
-}
+$google_maps_script_url = add_query_arg(
+    array(
+        'key' => $google_maps_api_key,
+        'callback' => 'essentaInitOfficeMaps',
+        'loading' => 'async',
+    ),
+    'https://maps.googleapis.com/maps/api/js'
+);
 ?>
 
 <section class="office-locations">
@@ -63,6 +55,7 @@ if ($office_locations && $google_maps_api_key !== '') {
             <div class="office-locations__stage">
                 <div
                     class="office-locations__map js-office-locations-map"
+                    data-maps-script-url="<?php echo esc_url($google_maps_script_url); ?>"
                     data-pin-icon="<?php echo esc_url(get_stylesheet_directory_uri() . '/dist/images/pin-teal.svg'); ?>"
                     aria-label="Office and delivery partner locations map">
                     <?php foreach ($office_locations as $location_index => $office_location) : ?>

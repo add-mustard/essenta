@@ -70,7 +70,9 @@
                     "@type": "ImageObject",
                     "@id": "https://essentadevedev.wpenginepowered.com/#logo",
                     "url": "https://essentadevedev.wpenginepowered.com/wp-content/uploads/2026/08/Primary_Blue-3.svg",
-                    "caption": "Essenta"
+                    "caption": "Essenta",
+                    "width": 116,
+                    "height": 22
                 },
                 "image": {
                     "@id": "https://essentadevedev.wpenginepowered.com/#logo"
@@ -137,7 +139,10 @@
                 <div class="site-brand col-2">
                     <a label="<?php bloginfo('name'); ?>" name="<?php bloginfo('name'); ?>" href="<?php echo esc_url(home_url('/')); ?>">
                         <?php if (has_custom_logo()) {
-                            the_custom_logo();
+                            echo wp_get_attachment_image(get_theme_mod('custom_logo'), 'full', false, array(
+                                'width'  => 116,
+                                'height' => 22,
+                            ));
                         } else {
                             echo '<h1>' . get_bloginfo('name') . '</h1>';
                         } ?>

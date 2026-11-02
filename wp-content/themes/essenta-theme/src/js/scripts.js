@@ -86,7 +86,10 @@ window.essentaInitOfficeMaps = function () {
   }
 
   mapElements.forEach(function (mapElement) {
-    if (mapElement.dataset.initialized === "true") return;
+    if (
+      mapElement.dataset.mapRequested !== "true" ||
+      mapElement.dataset.initialized === "true"
+    ) return;
 
     var markerElements = mapElement.querySelectorAll(
       ".office-locations__marker",
@@ -271,6 +274,44 @@ window.essentaInitOfficeMaps = function () {
     mapElement.dataset.initialized = "true";
   });
 };
+
+jQuery(function () {
+  var mapElements = document.querySelectorAll(".js-office-locations-map");
+  if (!mapElements.length) return;
+
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+
+        var mapElement = entry.target;
+        observer.unobserve(mapElement);
+        mapElement.dataset.mapRequested = "true";
+
+        if (window.google?.maps?.Map) {
+          window.essentaInitOfficeMaps();
+          return;
+        }
+
+        if (document.getElementById("essenta-google-maps-js")) return;
+
+        var script = document.createElement("script");
+        script.id = "essenta-google-maps-js";
+        script.src = mapElement.dataset.mapsScriptUrl;
+        script.async = true;
+        script.addEventListener("error", function () {
+          console.error("Essenta office maps could not load the Google Maps API.");
+        });
+        document.head.appendChild(script);
+      });
+    },
+    { rootMargin: "300px" },
+  );
+
+  mapElements.forEach(function (mapElement) {
+    observer.observe(mapElement);
+  });
+});
 
 // Wrap consecutive images in blog posts into a masonry grid
 jQuery(document).ready(function ($) {
