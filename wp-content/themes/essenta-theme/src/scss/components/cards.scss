@@ -238,6 +238,9 @@
 
   .team-archive__department,
   .team-archive__location {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
     font-family: var(--font-circular-med);
     color: var(--color-navy-500);
     display: inline-flex;
@@ -246,7 +249,13 @@
     margin: 0.15rem 0 0;
     padding: 0.3rem 0.45rem;
     text-transform: uppercase;
+    transition: filter 0.2s ease;
     width: fit-content;
+
+    &:hover,
+    &:focus-visible {
+      filter: brightness(0.94);
+    }
   }
 
   .team-archive__department {

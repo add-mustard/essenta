@@ -677,25 +677,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const visibleCountElement = filters.querySelector(
       "[data-team-visible-count]",
     );
-    const locationFilter = filters.querySelector(
-      '[data-team-filter="location"]',
+    const dropdowns = Array.from(
+      filters.querySelectorAll("[data-team-filter-dropdown]"),
     );
-    const departmentFilter = filters.querySelector(
-      '[data-team-filter="department"]',
-    );
+    const activeBar = directory.querySelector("[data-team-active-filters]");
+    const activeList = directory.querySelector("[data-team-active-list]");
+    const clearAllButton = directory.querySelector("[data-team-clear-all]");
+    const siteHeader = document.querySelector(".site-header");
 
-    function cardHasTerm(card, taxonomy, term) {
-      if (!term) return true;
-      return card.dataset[taxonomy].split(" ").includes(term);
+    function getCheckboxes(taxonomy) {
+      return Array.from(
+        filters.querySelectorAll(`[data-team-filter="${taxonomy}"]`),
+      );
+    }
+
+    function getSelected(taxonomy) {
+      return getCheckboxes(taxonomy)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
+    }
+
+    function cardHasAnyTerm(card, datasetKey, selected) {
+      if (!selected.length) return true;
+      const terms = card.dataset[datasetKey].split(" ");
+      return selected.some((slug) => terms.includes(slug));
+    }
+
+    function updateToggleLabels() {
+      dropdowns.forEach((dropdown) => {
+        const toggle = dropdown.querySelector("[data-team-filter-toggle]");
+        const label = dropdown.querySelector("[data-team-filter-label]");
+        const selectedCount = getSelected(
+          dropdown.dataset.teamFilterDropdown,
+        ).length;
+
+        label.textContent = selectedCount
+          ? `${toggle.dataset.defaultLabel} (${selectedCount})`
+          : toggle.dataset.defaultLabel;
+        dropdown.classList.toggle("has-selection", selectedCount > 0);
+      });
+    }
+
+    function renderActiveFilters() {
+      const checked = filters.querySelectorAll("[data-team-filter]:checked");
+
+      activeList.replaceChildren(
+        ...Array.from(checked, (checkbox) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "team-archive__active-chip";
+          chip.dataset.removeTaxonomy = checkbox.dataset.teamFilter;
+          chip.dataset.removeValue = checkbox.value;
+          chip.setAttribute(
+            "aria-label",
+            `Remove ${checkbox.dataset.filterName} filter`,
+          );
+          chip.textContent = checkbox.dataset.filterName;
+          return chip;
+        }),
+      );
+
+      activeBar.hidden = !checked.length;
+    }
+
+    function updateStickyOffset() {
+      const headerHeight = siteHeader ? siteHeader.offsetHeight : 0;
+      activeBar.style.setProperty("--team-sticky-top", `${headerHeight}px`);
     }
 
     function filterTeamMembers() {
+      const selectedLocations = getSelected("location");
+      const selectedDepartments = getSelected("department");
       let visibleCount = 0;
 
       cards.forEach((card, index) => {
         const isVisible =
-          cardHasTerm(card, "teamLocation", locationFilter.value) &&
-          cardHasTerm(card, "teamDepartment", departmentFilter.value);
+          cardHasAnyTerm(card, "teamLocation", selectedLocations) &&
+          cardHasAnyTerm(card, "teamDepartment", selectedDepartments);
 
         if (isVisible) {
           card.hidden = false;
@@ -720,10 +778,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
       emptyMessage.hidden = visibleCount !== 0;
       visibleCountElement.textContent = visibleCount;
+      updateToggleLabels();
+      renderActiveFilters();
     }
 
-    locationFilter.addEventListener("change", filterTeamMembers);
-    departmentFilter.addEventListener("change", filterTeamMembers);
+    function setCheckbox(taxonomy, value, checked) {
+      const checkbox = getCheckboxes(taxonomy).find(
+        (input) => input.value === value,
+      );
+      if (!checkbox || checkbox.checked === checked) return false;
+      checkbox.checked = checked;
+      return true;
+    }
+
+    function closeDropdowns(except) {
+      dropdowns.forEach((dropdown) => {
+        if (dropdown === except) return;
+        dropdown.querySelector("[data-team-filter-panel]").hidden = true;
+        dropdown
+          .querySelector("[data-team-filter-toggle]")
+          .setAttribute("aria-expanded", "false");
+      });
+    }
+
+    dropdowns.forEach((dropdown) => {
+      const toggle = dropdown.querySelector("[data-team-filter-toggle]");
+      const panel = dropdown.querySelector("[data-team-filter-panel]");
+
+      toggle.addEventListener("click", () => {
+        const isOpen = !panel.hidden;
+        closeDropdowns();
+        panel.hidden = isOpen;
+        toggle.setAttribute("aria-expanded", String(!isOpen));
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-team-filter-dropdown]")) {
+        closeDropdowns();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDropdowns();
+    });
+
+    filters.addEventListener("change", (event) => {
+      if (event.target.matches("[data-team-filter]")) filterTeamMembers();
+    });
+
+    activeBar.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-remove-taxonomy]");
+      if (!chip) return;
+      setCheckbox(chip.dataset.removeTaxonomy, chip.dataset.removeValue, false);
+      filterTeamMembers();
+    });
+
+    clearAllButton.addEventListener("click", () => {
+      filters
+        .querySelectorAll("[data-team-filter]:checked")
+        .forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+      filterTeamMembers();
+      filters.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    directory.addEventListener("click", (event) => {
+      const tag = event.target.closest("[data-team-filter-trigger]");
+      if (!tag) return;
+
+      // Don't let the click bubble up and open the profile drawer.
+      event.stopPropagation();
+      closeDropdowns();
+
+      const changed = setCheckbox(
+        tag.dataset.teamFilterTrigger,
+        tag.dataset.filterValue,
+        true,
+      );
+      if (!changed) return;
+
+      filterTeamMembers();
+      filters.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    // Flag when the bar is pinned below the header so it can gain a backdrop.
+    if ("IntersectionObserver" in window) {
+      const stickyObserver = new IntersectionObserver(
+        ([entry]) => {
+          activeBar.classList.toggle(
+            "is-stuck",
+            !entry.isIntersecting && entry.boundingClientRect.top < 0,
+          );
+        },
+        { rootMargin: "-120px 0px 0px 0px", threshold: 0 },
+      );
+      stickyObserver.observe(filters);
+    }
+
+    updateStickyOffset();
+    window.addEventListener("resize", updateStickyOffset);
   });
 
   document.querySelectorAll("[data-team-drawer]").forEach((drawerShell) => {
@@ -778,12 +933,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-team-filter-trigger]")) return;
       const trigger = event.target.closest(
         `[data-team-profile][aria-controls="${drawer.id}"]`,
       );
       if (trigger) openDrawer(trigger);
     });
     document.addEventListener("keydown", (event) => {
+      if (event.target.closest("[data-team-filter-trigger]")) return;
       const trigger = event.target.closest(
         `[data-team-profile][aria-controls="${drawer.id}"]`,
       );

@@ -72,27 +72,43 @@ $get_filter_term_slugs = static function ($terms, $taxonomy) {
                         <?php esc_html_e('experts', 'essenta-theme'); ?>
                     </p>
 
-                    <div class="team-archive__filter">
-                        <select id="team-location-filter" data-team-filter="location">
-                            <option value=""><?php esc_html_e('All locations', 'essenta-theme'); ?></option>
+                    <div class="team-archive__filter" data-team-filter-dropdown="location">
+                        <button type="button" class="team-archive__filter-toggle" id="team-location-filter" aria-expanded="false" aria-haspopup="true" data-team-filter-toggle data-default-label="<?php esc_attr_e('All locations', 'essenta-theme'); ?>">
+                            <span data-team-filter-label><?php esc_html_e('All locations', 'essenta-theme'); ?></span>
+                        </button>
+                        <div class="team-archive__filter-panel" data-team-filter-panel hidden>
                             <?php if (!is_wp_error($team_locations)) : ?>
                                 <?php foreach ($team_locations as $team_location) : ?>
-                                    <option value="<?php echo esc_attr($team_location->slug); ?>"><?php echo esc_html($team_location->name); ?></option>
+                                    <label class="team-archive__filter-option">
+                                        <input type="checkbox" value="<?php echo esc_attr($team_location->slug); ?>" data-team-filter="location" data-filter-name="<?php echo esc_attr($team_location->name); ?>">
+                                        <span><?php echo esc_html($team_location->name); ?></span>
+                                    </label>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </select>
+                        </div>
                     </div>
 
-                    <div class="team-archive__filter">
-                        <select id="team-department-filter" data-team-filter="department">
-                            <option value=""><?php esc_html_e('All expertise', 'essenta-theme'); ?></option>
+                    <div class="team-archive__filter" data-team-filter-dropdown="department">
+                        <button type="button" class="team-archive__filter-toggle" id="team-department-filter" aria-expanded="false" aria-haspopup="true" data-team-filter-toggle data-default-label="<?php esc_attr_e('All expertise', 'essenta-theme'); ?>">
+                            <span data-team-filter-label><?php esc_html_e('All expertise', 'essenta-theme'); ?></span>
+                        </button>
+                        <div class="team-archive__filter-panel" data-team-filter-panel hidden>
                             <?php if (!is_wp_error($team_departments)) : ?>
                                 <?php foreach ($team_departments as $team_department) : ?>
-                                    <option value="<?php echo esc_attr($team_department->slug); ?>"><?php echo esc_html($team_department->name); ?></option>
+                                    <label class="team-archive__filter-option">
+                                        <input type="checkbox" value="<?php echo esc_attr($team_department->slug); ?>" data-team-filter="department" data-filter-name="<?php echo esc_attr($team_department->name); ?>">
+                                        <span><?php echo esc_html($team_department->name); ?></span>
+                                    </label>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                        </select>
+                        </div>
                     </div>
+                </div>
+
+                <div class="team-archive__active-filters" data-team-active-filters hidden>
+                    <span class="team-archive__active-label"><?php esc_html_e('Filtering by:', 'essenta-theme'); ?></span>
+                    <div class="team-archive__active-list" data-team-active-list></div>
+                    <button type="button" class="team-archive__clear-all" data-team-clear-all><?php esc_html_e('Clear all', 'essenta-theme'); ?></button>
                 </div>
 
                 <p class="team-archive__empty" data-team-empty hidden><?php esc_html_e('No team members match these filters.', 'essenta-theme'); ?></p>
@@ -135,12 +151,24 @@ $get_filter_term_slugs = static function ($terms, $taxonomy) {
 
                                     <?php if ($departments && !is_wp_error($departments)) : ?>
                                         <?php foreach ($departments as $department): ?>
-                                            <p class="team-archive__department"><?php echo esc_html($department->name); ?></p>
+                                            <button
+                                                type="button"
+                                                class="team-archive__department"
+                                                data-team-filter-trigger="department"
+                                                data-filter-value="<?php echo esc_attr($department->slug); ?>"
+                                                aria-label="<?php echo esc_attr(sprintf(__('Filter team by %s', 'essenta-theme'), $department->name)); ?>"><?php echo esc_html($department->name); ?></button>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
 
                                     <?php if ($locations && !is_wp_error($locations)) : ?>
-                                        <p class="team-archive__location"><?php echo esc_html(implode(', ', wp_list_pluck($locations, 'name'))); ?></p>
+                                        <?php foreach ($locations as $location) : ?>
+                                            <button
+                                                type="button"
+                                                class="team-archive__location"
+                                                data-team-filter-trigger="location"
+                                                data-filter-value="<?php echo esc_attr($location->slug); ?>"
+                                                aria-label="<?php echo esc_attr(sprintf(__('Filter team by %s', 'essenta-theme'), $location->name)); ?>"><?php echo esc_html($location->name); ?></button>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 </div>
                                 <div class="btn cta-link">View Profile</div>
