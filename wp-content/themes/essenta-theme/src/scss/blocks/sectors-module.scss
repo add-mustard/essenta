@@ -133,7 +133,7 @@
 
   .sectors-card__title {
     font-family: var(--font-circular-reg);
-    font-size: 1rem;
+    font-size: clamp(20px, 1.5vw, 24px);
     font-weight: 400;
     line-height: 1.2;
     margin: 0;
@@ -149,6 +149,7 @@
     font-size: 15px;
     line-height: 1.4;
     margin-top: 0.65rem;
+    margin-bottom: 0.65rem;
     display: inline-block;
   }
 
