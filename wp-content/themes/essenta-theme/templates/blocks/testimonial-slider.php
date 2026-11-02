@@ -56,7 +56,7 @@ if ($testimonial_total) : ?>
         </div>
         <?php if ($testimonial_total > 1) : ?>
           <div class="testimonials-block-slider-nav testimonials">
-            <div class="slider-dots"></div>
+            <div class="slider-dots testimonial-dots"></div>
           </div>
         <?php endif; ?>
       </div>

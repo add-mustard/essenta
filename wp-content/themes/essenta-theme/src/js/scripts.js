@@ -200,18 +200,18 @@ window.essentaInitOfficeMaps = function () {
         clickable: isOffice,
         icon: isOffice
           ? {
-              anchor: new google.maps.Point(12, 22),
-              scaledSize: new google.maps.Size(36, 36),
-              url: pinIconUrl,
-            }
+            anchor: new google.maps.Point(12, 22),
+            scaledSize: new google.maps.Size(36, 36),
+            url: pinIconUrl,
+          }
           : {
-              fillColor: "#00a2aa",
-              fillOpacity: 1,
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 5,
-              strokeColor: "#00a2aa",
-              strokeWeight: 0,
-            },
+            fillColor: "#00a2aa",
+            fillOpacity: 1,
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            strokeColor: "#00a2aa",
+            strokeWeight: 0,
+          },
         map: map,
         opacity: isOffice ? 1 : 0,
         position: position,
@@ -866,7 +866,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Flag when the bar is pinned below the header so it can gain a backdrop.
     if ("IntersectionObserver" in window) {
       const stickyObserver = new IntersectionObserver(
-        ([entry]) => {
+        (entries) => {
+          const entry = entries[entries.length - 1];
           activeBar.classList.toggle(
             "is-stuck",
             !entry.isIntersecting && entry.boundingClientRect.top < 0,
@@ -963,7 +964,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const focusable = Array.from(
         drawer.querySelectorAll(
-          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          "a[href], button:not([disabled]), [tabindex]:not([tabindex=\"-1\"])",
         ),
       ).filter((element) => !element.closest("[hidden]"));
       if (!focusable.length) return;
@@ -978,6 +979,109 @@ document.addEventListener("DOMContentLoaded", () => {
         first.focus();
       }
     });
+  });
+
+  document.querySelectorAll("[data-sector-popover]").forEach((popover) => {
+    if (typeof popover.showPopover !== "function") return;
+
+    const module = popover.closest(".sectors-module");
+    const textElement = popover.querySelector("[data-sector-popover-text]");
+    const closeButton = popover.querySelector("[data-sector-popover-close]");
+    let activeTrigger = null;
+    let reopenGuard = false;
+    let dismissedByPointer = false;
+
+    document.addEventListener("pointerdown", (event) => {
+      dismissedByPointer = isOpen() && !popover.contains(event.target);
+    });
+    const isOpen = () => popover.matches(":popover-open");
+
+    function positionPopover() {
+      if (!activeTrigger || !activeTrigger.isConnected) {
+        if (isOpen()) popover.hidePopover();
+        return;
+      }
+
+      const gap = 8;
+      const margin = 16;
+      const triggerRect = activeTrigger.getBoundingClientRect();
+      const popoverRect = popover.getBoundingClientRect();
+
+      let top = triggerRect.bottom + gap;
+      if (
+        top + popoverRect.height > window.innerHeight - margin &&
+        triggerRect.top - gap - popoverRect.height >= margin
+      ) {
+        top = triggerRect.top - gap - popoverRect.height;
+      }
+
+      const maxLeft = window.innerWidth - popoverRect.width - margin;
+      const left = Math.max(margin, Math.min(triggerRect.left, maxLeft));
+
+      popover.style.top = `${Math.round(top)}px`;
+      popover.style.left = `${Math.round(left)}px`;
+    }
+
+    function openPopover(trigger) {
+      if (activeTrigger && activeTrigger !== trigger) {
+        activeTrigger.setAttribute("aria-expanded", "false");
+      }
+      activeTrigger = trigger;
+      dismissedByPointer = false;
+      textElement.textContent = trigger.dataset.sectorExcerpt || "";
+
+      popover.showPopover();
+      trigger.setAttribute("aria-expanded", "true");
+      window.addEventListener("scroll", positionPopover, true);
+      window.addEventListener("resize", positionPopover);
+      positionPopover();
+      closeButton.focus({ preventScroll: true });
+    }
+
+    // Light dismiss closes the popover on pointerdown, so remember whether the
+    // same trigger was already open to make a second click act as a toggle.
+    module.addEventListener("pointerdown", (event) => {
+      const trigger = event.target.closest(".sectors-card__read-more");
+      reopenGuard = !!trigger && trigger === activeTrigger && isOpen();
+    });
+
+    module.addEventListener("click", (event) => {
+      const trigger = event.target.closest(".sectors-card__read-more");
+      if (!trigger) return;
+
+      event.preventDefault();
+      if (reopenGuard) {
+        reopenGuard = false;
+        return;
+      }
+      if (isOpen()) popover.hidePopover();
+      openPopover(trigger);
+    });
+
+    closeButton.addEventListener("click", () => popover.hidePopover());
+
+    // toggle fires async, so ignore a stale "closed" if another trigger reopened it.
+    popover.addEventListener("toggle", () => {
+      if (isOpen()) return;
+
+      window.removeEventListener("scroll", positionPopover, true);
+      window.removeEventListener("resize", positionPopover);
+
+      // Only return focus for close button / Esc, not a click elsewhere on the page.
+      if (!dismissedByPointer && activeTrigger?.isConnected) {
+        activeTrigger.focus({ preventScroll: true });
+      }
+      dismissedByPointer = false;
+
+      activeTrigger?.setAttribute("aria-expanded", "false");
+      activeTrigger = null;
+    });
+
+    if (window.jQuery) {
+      window.jQuery(module).on("beforeChange", () => {
+        if (isOpen()) popover.hidePopover();
+      });
+    }
   });
 
   // Keep the original nodes so expanding preserves event listeners and form state.

@@ -100,14 +100,10 @@ function processFonts() {
 // Lint JavaScript
 function lintJS() {
   return gulp
-    .src(["./src/js/**/*.js"])
+    .src(["./src/js/**/*.js", "!./src/js/slick.js"])
     .pipe(eslint()) // Run ESLint
     .pipe(eslint.format()) // Output linting results to the console
-    .pipe(eslint.failAfterError()) // Fail task on linting error
-    .on("error", function (err) {
-      console.error("ESLint error:", err.message); // Log ESLint error
-      this.emit("end"); // Prevent Gulp from crashing
-    });
+    .pipe(eslint.failAfterError()); // Fail task on linting error
 }
 
 // Watch SCSS files for changes
@@ -123,6 +119,7 @@ function watchFiles() {
 
 // Define default task
 const defaultTask = gulp.series(
+  lintJS,
   gulp.parallel(
     compileSCSS,
     compileAdminSCSS,
@@ -130,7 +127,6 @@ const defaultTask = gulp.series(
     minifySliders,
     processImages,
     processFonts,
-    lintJS,
   ),
   watchFiles,
 );

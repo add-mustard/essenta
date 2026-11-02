@@ -110,7 +110,7 @@ jQuery(function ($) {
       dots: true,
       arrows: false,
       appendDots: $block.find(
-        ".testimonials-block-slider-nav.testimonials .slider-dots",
+        ".testimonials-block-slider-nav.testimonials .slider-dots.testimonial-dots",
       ),
       adaptiveHeight: false,
     });
@@ -891,7 +891,7 @@ jQuery(function ($) {
     const $grid = jQuery(grid);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const cards = Array.from(grid.children);
-    const mobileQuery = window.matchMedia("(max-width: 760px)");
+    const mobileQuery = window.matchMedia("(max-width: 980px)");
 
     function syncSectorsSlider() {
       if ($grid.hasClass("slick-initialized")) {
