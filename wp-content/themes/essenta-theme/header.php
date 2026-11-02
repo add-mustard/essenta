@@ -7,13 +7,36 @@
     <title><?php wp_title('|', true, 'right'); ?></title>
     <?php wp_head(); ?>
 
-    <!-- Adelle AdobeFont -->
-    <link rel="stylesheet" href="https://use.typekit.net/kxn1npi.css">
+    <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+    <link rel="preconnect" href="https://p.typekit.net" crossorigin>
 
-    <!-- Plus Jakarta Sans google font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <link
+        rel="preload"
+        href="https://use.typekit.net/kxn1npi.css"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+
+    <noscript>
+        <link rel="stylesheet" href="https://use.typekit.net/kxn1npi.css">
+    </noscript>
+
+
+    <!-- Preload the Regular weight (Highest priority for body text) -->
+    <link
+        rel="preload"
+        href="<?php echo get_template_directory_uri(); ?>/dist/fonts/CircularXXWeb-Regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin>
+
+    <!-- Optional: Preload the Bold weight if your main above-the-fold heading uses it -->
+    <link
+        rel="preload"
+        href="<?php echo get_template_directory_uri(); ?>/dist/fonts/CircularXXWeb-Bold.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin>
+
 
     <!-- Google Tag Manager -->
     <script>
@@ -112,7 +135,7 @@
         <header class="site-header">
             <div class="site-header-inner">
                 <div class="site-brand col-2">
-                    <a href="<?php echo esc_url(home_url('/')); ?>">
+                    <a label="<?php bloginfo('name'); ?>" name="<?php bloginfo('name'); ?>" href="<?php echo esc_url(home_url('/')); ?>">
                         <?php if (has_custom_logo()) {
                             the_custom_logo();
                         } else {

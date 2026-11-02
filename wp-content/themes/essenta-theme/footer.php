@@ -42,7 +42,7 @@ $footer_locations = get_field('company_footer_locations', 'option');
                         ?>
                                 <div class="social-link-item">
                                     <?php if (!empty($social['social_url'])) :
-                                        echo '<a target="_blank" href="' . esc_url($social['social_url']) . '"><i class="icon-' . strtolower(esc_attr($social['social_name'])) . '"></i></a>';
+                                        echo '<a name="' . esc_attr($social['social_name']) . '" label="' . esc_attr($social['social_name']) . '" target="_blank" href="' . esc_url($social['social_url']) . '"><i class="icon-' . strtolower(esc_attr($social['social_name'])) . '"></i></a>';
                                     endif; ?>
                                 </div>
                         <?php
@@ -75,7 +75,7 @@ $footer_locations = get_field('company_footer_locations', 'option');
                         ?>
                                 <div class="social-link-item">
                                     <?php if (!empty($social['social_url'])) :
-                                        echo '<a target="_blank" href="' . esc_url($social['social_url']) . '"><i class="icon-' . strtolower(esc_attr($social['social_name'])) . '"></i></a>';
+                                        echo '<a label="' . esc_attr($social['social_name']) . '" name="' . esc_attr($social['social_name']) . '" target="_blank" href="' . esc_url($social['social_url']) . '"><i class="icon-' . strtolower(esc_attr($social['social_name'])) . '"></i></a>';
                                     endif; ?>
                                 </div>
                         <?php

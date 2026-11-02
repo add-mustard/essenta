@@ -30,7 +30,7 @@ $hero_cta_link = get_sub_field('homepage_cta');
   <?php if ($hero_image && $hero_image['type'] === 'video'): ?>
     <div class="homepage-hero-image-wrapper has-video">
       <div class="homepage-hero-image has-video" data-hero-video-modal="homepage-hero-video-modal">
-        <video class="homepage-hero-video" muted playsinline preload="metadata" poster="<?php echo esc_url(get_the_post_thumbnail_url($hero_image['ID'], 'full')); ?>">
+        <video class="homepage-hero-video" muted playsinline preload="metadata" fetchpriority="high" poster="<?php echo esc_url(get_the_post_thumbnail_url($hero_image['ID'], 'full')); ?>">
           <source
             src="<?php echo esc_url($hero_image['url']); ?>"
             type="video/mp4">
@@ -48,8 +48,7 @@ $hero_cta_link = get_sub_field('homepage_cta');
     <div class="homepage-hero-image-wrapper">
       <div class="homepage-hero-image">
         <?php if ($hero_image && $hero_image['type'] === 'image'): ?>
-          <img
-            loading="lazy"
+          <img fetchpriority="high"
             src="<?php echo esc_url($hero_image['url']); ?>"
             alt="<?php echo esc_attr($hero_image['alt']); ?>">
         <?php endif; ?>

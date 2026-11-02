@@ -200,18 +200,18 @@ window.essentaInitOfficeMaps = function () {
         clickable: isOffice,
         icon: isOffice
           ? {
-              anchor: new google.maps.Point(12, 22),
-              scaledSize: new google.maps.Size(36, 36),
-              url: pinIconUrl,
-            }
+            anchor: new google.maps.Point(12, 22),
+            scaledSize: new google.maps.Size(36, 36),
+            url: pinIconUrl,
+          }
           : {
-              fillColor: "#00a2aa",
-              fillOpacity: 1,
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 5,
-              strokeColor: "#00a2aa",
-              strokeWeight: 0,
-            },
+            fillColor: "#00a2aa",
+            fillOpacity: 1,
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            strokeColor: "#00a2aa",
+            strokeWeight: 0,
+          },
         map: map,
         opacity: isOffice ? 1 : 0,
         position: position,
@@ -412,15 +412,15 @@ jQuery(document).ready(function ($) {
 
   if ($drawer.length && $toggle.length && $overlay.length) {
     var menuContent = $drawer.find(".mm-menu-content").get(0);
-    var rootMenu = menuContent
-      ? menuContent.querySelector(".mega-menu")
-      : null;
+    var rootMenu = menuContent ? menuContent.querySelector(".mega-menu") : null;
     var panelItems = [];
 
     if (rootMenu) {
       panelItems = Array.from(rootMenu.children).filter(function (item) {
-        return item.matches(".mega-menu-item-has-children") &&
-          item.querySelector(":scope > ul.mega-sub-menu");
+        return (
+          item.matches(".mega-menu-item-has-children") &&
+          item.querySelector(":scope > ul.mega-sub-menu")
+        );
       });
 
       panelItems.forEach(function (item) {
@@ -440,7 +440,10 @@ jQuery(document).ready(function ($) {
         var backButton = document.createElement("button");
         backButton.className = "mm-panel-back";
         backButton.type = "button";
-        backButton.setAttribute("aria-label", "Back to " + link.textContent.trim());
+        backButton.setAttribute(
+          "aria-label",
+          "Back to " + link.textContent.trim(),
+        );
 
         var backLabel = document.createElement("span");
         backLabel.textContent = link.textContent.trim();
@@ -609,42 +612,46 @@ jQuery(document).ready(function ($) {
 
 // Hero video: clicking the inline video (or play button) opens it in a modal
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".homepage-hero-image.has-video").forEach((hero) => {
-    const modal = document.getElementById(hero.dataset.heroVideoModal);
-    if (!modal) {
-      return;
-    }
-
-    const modalVideo = modal.querySelector(".homepage-hero-video-modal-video");
-
-    function openModal() {
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      modalVideo.currentTime = 0;
-      modalVideo.play().catch(() => {});
-    }
-
-    function closeModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      modalVideo.pause();
-      modalVideo.currentTime = 0;
-    }
-
-    hero.addEventListener("click", openModal);
-
-    modal.querySelectorAll("[data-hero-video-modal-close]").forEach((el) => {
-      el.addEventListener("click", closeModal);
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && modal.classList.contains("is-open")) {
-        closeModal();
+  document
+    .querySelectorAll(".homepage-hero-image.has-video")
+    .forEach((hero) => {
+      const modal = document.getElementById(hero.dataset.heroVideoModal);
+      if (!modal) {
+        return;
       }
+
+      const modalVideo = modal.querySelector(
+        ".homepage-hero-video-modal-video",
+      );
+
+      function openModal() {
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        modalVideo.currentTime = 0;
+        modalVideo.play().catch(() => {});
+      }
+
+      function closeModal() {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+      }
+
+      hero.addEventListener("click", openModal);
+
+      modal.querySelectorAll("[data-hero-video-modal-close]").forEach((el) => {
+        el.addEventListener("click", closeModal);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.classList.contains("is-open")) {
+          closeModal();
+        }
+      });
     });
-  });
 
   function updateFooterDetails() {
     const details = document.querySelectorAll(".footer-details-wrapper");
@@ -670,25 +677,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const visibleCountElement = filters.querySelector(
       "[data-team-visible-count]",
     );
-    const locationFilter = filters.querySelector(
-      '[data-team-filter="location"]',
+    const dropdowns = Array.from(
+      filters.querySelectorAll("[data-team-filter-dropdown]"),
     );
-    const departmentFilter = filters.querySelector(
-      '[data-team-filter="department"]',
-    );
+    const activeBar = directory.querySelector("[data-team-active-filters]");
+    const activeList = directory.querySelector("[data-team-active-list]");
+    const clearAllButton = directory.querySelector("[data-team-clear-all]");
+    const siteHeader = document.querySelector(".site-header");
 
-    function cardHasTerm(card, taxonomy, term) {
-      if (!term) return true;
-      return card.dataset[taxonomy].split(" ").includes(term);
+    function getCheckboxes(taxonomy) {
+      return Array.from(
+        filters.querySelectorAll(`[data-team-filter="${taxonomy}"]`),
+      );
+    }
+
+    function getSelected(taxonomy) {
+      return getCheckboxes(taxonomy)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
+    }
+
+    function cardHasAnyTerm(card, datasetKey, selected) {
+      if (!selected.length) return true;
+      const terms = card.dataset[datasetKey].split(" ");
+      return selected.some((slug) => terms.includes(slug));
+    }
+
+    function updateToggleLabels() {
+      dropdowns.forEach((dropdown) => {
+        const toggle = dropdown.querySelector("[data-team-filter-toggle]");
+        const label = dropdown.querySelector("[data-team-filter-label]");
+        const selectedCount = getSelected(
+          dropdown.dataset.teamFilterDropdown,
+        ).length;
+
+        label.textContent = selectedCount
+          ? `${toggle.dataset.defaultLabel} (${selectedCount})`
+          : toggle.dataset.defaultLabel;
+        dropdown.classList.toggle("has-selection", selectedCount > 0);
+      });
+    }
+
+    function renderActiveFilters() {
+      const checked = filters.querySelectorAll("[data-team-filter]:checked");
+
+      activeList.replaceChildren(
+        ...Array.from(checked, (checkbox) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "team-archive__active-chip";
+          chip.dataset.removeTaxonomy = checkbox.dataset.teamFilter;
+          chip.dataset.removeValue = checkbox.value;
+          chip.setAttribute(
+            "aria-label",
+            `Remove ${checkbox.dataset.filterName} filter`,
+          );
+          chip.textContent = checkbox.dataset.filterName;
+          return chip;
+        }),
+      );
+
+      activeBar.hidden = !checked.length;
+    }
+
+    function updateStickyOffset() {
+      const headerHeight = siteHeader ? siteHeader.offsetHeight : 0;
+      activeBar.style.setProperty("--team-sticky-top", `${headerHeight}px`);
     }
 
     function filterTeamMembers() {
+      const selectedLocations = getSelected("location");
+      const selectedDepartments = getSelected("department");
       let visibleCount = 0;
 
       cards.forEach((card, index) => {
         const isVisible =
-          cardHasTerm(card, "teamLocation", locationFilter.value) &&
-          cardHasTerm(card, "teamDepartment", departmentFilter.value);
+          cardHasAnyTerm(card, "teamLocation", selectedLocations) &&
+          cardHasAnyTerm(card, "teamDepartment", selectedDepartments);
 
         if (isVisible) {
           card.hidden = false;
@@ -713,10 +778,108 @@ document.addEventListener("DOMContentLoaded", () => {
 
       emptyMessage.hidden = visibleCount !== 0;
       visibleCountElement.textContent = visibleCount;
+      updateToggleLabels();
+      renderActiveFilters();
     }
 
-    locationFilter.addEventListener("change", filterTeamMembers);
-    departmentFilter.addEventListener("change", filterTeamMembers);
+    function setCheckbox(taxonomy, value, checked) {
+      const checkbox = getCheckboxes(taxonomy).find(
+        (input) => input.value === value,
+      );
+      if (!checkbox || checkbox.checked === checked) return false;
+      checkbox.checked = checked;
+      return true;
+    }
+
+    function closeDropdowns(except) {
+      dropdowns.forEach((dropdown) => {
+        if (dropdown === except) return;
+        dropdown.querySelector("[data-team-filter-panel]").hidden = true;
+        dropdown
+          .querySelector("[data-team-filter-toggle]")
+          .setAttribute("aria-expanded", "false");
+      });
+    }
+
+    dropdowns.forEach((dropdown) => {
+      const toggle = dropdown.querySelector("[data-team-filter-toggle]");
+      const panel = dropdown.querySelector("[data-team-filter-panel]");
+
+      toggle.addEventListener("click", () => {
+        const isOpen = !panel.hidden;
+        closeDropdowns();
+        panel.hidden = isOpen;
+        toggle.setAttribute("aria-expanded", String(!isOpen));
+      });
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("[data-team-filter-dropdown]")) {
+        closeDropdowns();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDropdowns();
+    });
+
+    filters.addEventListener("change", (event) => {
+      if (event.target.matches("[data-team-filter]")) filterTeamMembers();
+    });
+
+    activeBar.addEventListener("click", (event) => {
+      const chip = event.target.closest("[data-remove-taxonomy]");
+      if (!chip) return;
+      setCheckbox(chip.dataset.removeTaxonomy, chip.dataset.removeValue, false);
+      filterTeamMembers();
+    });
+
+    clearAllButton.addEventListener("click", () => {
+      filters
+        .querySelectorAll("[data-team-filter]:checked")
+        .forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+      filterTeamMembers();
+      filters.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    directory.addEventListener("click", (event) => {
+      const tag = event.target.closest("[data-team-filter-trigger]");
+      if (!tag) return;
+
+      // Don't let the click bubble up and open the profile drawer.
+      event.stopPropagation();
+      closeDropdowns();
+
+      const changed = setCheckbox(
+        tag.dataset.teamFilterTrigger,
+        tag.dataset.filterValue,
+        true,
+      );
+      if (!changed) return;
+
+      filterTeamMembers();
+      filters.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    // Flag when the bar is pinned below the header so it can gain a backdrop.
+    if ("IntersectionObserver" in window) {
+      const stickyObserver = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[entries.length - 1];
+          activeBar.classList.toggle(
+            "is-stuck",
+            !entry.isIntersecting && entry.boundingClientRect.top < 0,
+          );
+        },
+        { rootMargin: "-120px 0px 0px 0px", threshold: 0 },
+      );
+      stickyObserver.observe(filters);
+    }
+
+    updateStickyOffset();
+    window.addEventListener("resize", updateStickyOffset);
   });
 
   document.querySelectorAll("[data-team-drawer]").forEach((drawerShell) => {
@@ -771,12 +934,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-team-filter-trigger]")) return;
       const trigger = event.target.closest(
         `[data-team-profile][aria-controls="${drawer.id}"]`,
       );
       if (trigger) openDrawer(trigger);
     });
     document.addEventListener("keydown", (event) => {
+      if (event.target.closest("[data-team-filter-trigger]")) return;
       const trigger = event.target.closest(
         `[data-team-profile][aria-controls="${drawer.id}"]`,
       );
@@ -799,7 +964,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const focusable = Array.from(
         drawer.querySelectorAll(
-          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          "a[href], button:not([disabled]), [tabindex]:not([tabindex=\"-1\"])",
         ),
       ).filter((element) => !element.closest("[hidden]"));
       if (!focusable.length) return;
@@ -814,6 +979,109 @@ document.addEventListener("DOMContentLoaded", () => {
         first.focus();
       }
     });
+  });
+
+  document.querySelectorAll("[data-sector-popover]").forEach((popover) => {
+    if (typeof popover.showPopover !== "function") return;
+
+    const module = popover.closest(".sectors-module");
+    const textElement = popover.querySelector("[data-sector-popover-text]");
+    const closeButton = popover.querySelector("[data-sector-popover-close]");
+    let activeTrigger = null;
+    let reopenGuard = false;
+    let dismissedByPointer = false;
+
+    document.addEventListener("pointerdown", (event) => {
+      dismissedByPointer = isOpen() && !popover.contains(event.target);
+    });
+    const isOpen = () => popover.matches(":popover-open");
+
+    function positionPopover() {
+      if (!activeTrigger || !activeTrigger.isConnected) {
+        if (isOpen()) popover.hidePopover();
+        return;
+      }
+
+      const gap = 8;
+      const margin = 16;
+      const triggerRect = activeTrigger.getBoundingClientRect();
+      const popoverRect = popover.getBoundingClientRect();
+
+      let top = triggerRect.bottom + gap;
+      if (
+        top + popoverRect.height > window.innerHeight - margin &&
+        triggerRect.top - gap - popoverRect.height >= margin
+      ) {
+        top = triggerRect.top - gap - popoverRect.height;
+      }
+
+      const maxLeft = window.innerWidth - popoverRect.width - margin;
+      const left = Math.max(margin, Math.min(triggerRect.left, maxLeft));
+
+      popover.style.top = `${Math.round(top)}px`;
+      popover.style.left = `${Math.round(left)}px`;
+    }
+
+    function openPopover(trigger) {
+      if (activeTrigger && activeTrigger !== trigger) {
+        activeTrigger.setAttribute("aria-expanded", "false");
+      }
+      activeTrigger = trigger;
+      dismissedByPointer = false;
+      textElement.textContent = trigger.dataset.sectorExcerpt || "";
+
+      popover.showPopover();
+      trigger.setAttribute("aria-expanded", "true");
+      window.addEventListener("scroll", positionPopover, true);
+      window.addEventListener("resize", positionPopover);
+      positionPopover();
+      closeButton.focus({ preventScroll: true });
+    }
+
+    // Light dismiss closes the popover on pointerdown, so remember whether the
+    // same trigger was already open to make a second click act as a toggle.
+    module.addEventListener("pointerdown", (event) => {
+      const trigger = event.target.closest(".sectors-card__read-more");
+      reopenGuard = !!trigger && trigger === activeTrigger && isOpen();
+    });
+
+    module.addEventListener("click", (event) => {
+      const trigger = event.target.closest(".sectors-card__read-more");
+      if (!trigger) return;
+
+      event.preventDefault();
+      if (reopenGuard) {
+        reopenGuard = false;
+        return;
+      }
+      if (isOpen()) popover.hidePopover();
+      openPopover(trigger);
+    });
+
+    closeButton.addEventListener("click", () => popover.hidePopover());
+
+    // toggle fires async, so ignore a stale "closed" if another trigger reopened it.
+    popover.addEventListener("toggle", () => {
+      if (isOpen()) return;
+
+      window.removeEventListener("scroll", positionPopover, true);
+      window.removeEventListener("resize", positionPopover);
+
+      // Only return focus for close button / Esc, not a click elsewhere on the page.
+      if (!dismissedByPointer && activeTrigger?.isConnected) {
+        activeTrigger.focus({ preventScroll: true });
+      }
+      dismissedByPointer = false;
+
+      activeTrigger?.setAttribute("aria-expanded", "false");
+      activeTrigger = null;
+    });
+
+    if (window.jQuery) {
+      window.jQuery(module).on("beforeChange", () => {
+        if (isOpen()) popover.hidePopover();
+      });
+    }
   });
 
   // Keep the original nodes so expanding preserves event listeners and form state.
@@ -903,8 +1171,16 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!reducedMotionQuery.matches && startHeight !== endHeight) {
         const animation = container.animate(
           [
-            { height: `${startHeight}px`, boxSizing: "border-box", overflow: "hidden" },
-            { height: `${endHeight}px`, boxSizing: "border-box", overflow: "hidden" },
+            {
+              height: `${startHeight}px`,
+              boxSizing: "border-box",
+              overflow: "hidden",
+            },
+            {
+              height: `${endHeight}px`,
+              boxSizing: "border-box",
+              overflow: "hidden",
+            },
           ],
           { duration: 350, easing: "cubic-bezier(0.4, 0, 0.2, 1)" },
         );

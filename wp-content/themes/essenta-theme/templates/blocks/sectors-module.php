@@ -93,6 +93,8 @@ $manual_sectors = get_sub_field('manual_sectors');
                                             'medium_large',
                                             array(
                                                 'loading' => 'lazy',
+                                                'width' => '264',
+                                                'height' => '264'
                                             )
                                         );
                                         ?>
@@ -106,13 +108,27 @@ $manual_sectors = get_sub_field('manual_sectors');
                                         </a>
                                     </h3>
 
-                                    <div class="sectors-card__excerpt">
-                                        <?php echo esc_html(get_the_excerpt()); ?>
-                                    </div>
+                                    <?php $full_excerpt = trim(wp_strip_all_tags(get_the_excerpt())); ?>
+                                    <?php if ($full_excerpt) : ?>
+                                        <div class="sectors-card__excerpt">
+                                            <span class="sectors-card__excerpt-text"><?php echo esc_html(wp_html_excerpt($full_excerpt, 100, '…')); ?></span>
+                                            <?php if (mb_strlen($full_excerpt) > 100) : ?>
+                                                <button
+                                                    type="button"
+                                                    class="sectors-card__read-more"
+                                                    aria-haspopup="dialog"
+                                                    aria-expanded="false"
+                                                    aria-controls="<?php echo esc_attr($grid_id); ?>-popover"
+                                                    data-sector-excerpt="<?php echo esc_attr($full_excerpt); ?>">
+                                                    <?php esc_html_e('Read more', 'essenta-theme'); ?>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <a
                                         class="sectors-card__cta btn cta-link"
                                         href="<?php the_permalink(); ?>">
-                                        Read more
+                                        Find out more
                                     </a>
                                 </div>
 
@@ -134,7 +150,9 @@ $manual_sectors = get_sub_field('manual_sectors');
 
                                     <?php if ($sector_image) : ?>
                                         <div class="sectors-card__image">
-                                            <img
+                                            <img loading="lazy"
+                                                width="264"
+                                                height="264"
                                                 src="<?php echo esc_url($sector_image['url']); ?>"
                                                 alt="<?php echo esc_attr($sector_image['alt']); ?>"
                                                 loading="lazy" />
@@ -147,9 +165,23 @@ $manual_sectors = get_sub_field('manual_sectors');
                                             <?php echo esc_html($sector_title); ?>
                                         </h3>
 
-                                        <div class="sectors-card__excerpt">
-                                            <?php echo esc_html(wp_strip_all_tags($sector_text)); ?>
-                                        </div>
+                                        <?php $sector_full_text = trim(wp_strip_all_tags((string) $sector_text)); ?>
+                                        <?php if ($sector_full_text) : ?>
+                                            <div class="sectors-card__excerpt">
+                                                <span class="sectors-card__excerpt-text"><?php echo esc_html(wp_html_excerpt($sector_full_text, 100, '…')); ?></span>
+                                                <?php if (mb_strlen($sector_full_text) > 100) : ?>
+                                                    <button
+                                                        type="button"
+                                                        class="sectors-card__read-more"
+                                                        aria-haspopup="dialog"
+                                                        aria-expanded="false"
+                                                        aria-controls="<?php echo esc_attr($grid_id); ?>-popover"
+                                                        data-sector-excerpt="<?php echo esc_attr($sector_full_text); ?>">
+                                                        <?php esc_html_e('Read more', 'essenta-theme'); ?>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
 
                                     </div>
 
@@ -159,6 +191,17 @@ $manual_sectors = get_sub_field('manual_sectors');
 
                         <?php endif; ?>
 
+                    </div>
+
+                    <div
+                        class="sectors-popover"
+                        id="<?php echo esc_attr($grid_id); ?>-popover"
+                        role="dialog"
+                        aria-label="<?php esc_attr_e('Sector excerpt', 'essenta-theme'); ?>"
+                        popover
+                        data-sector-popover>
+                        <button type="button" class="sectors-popover__close" aria-label="<?php esc_attr_e('Close', 'essenta-theme'); ?>" data-sector-popover-close></button>
+                        <p class="sectors-popover__text" data-sector-popover-text></p>
                     </div>
                 </div>
 
