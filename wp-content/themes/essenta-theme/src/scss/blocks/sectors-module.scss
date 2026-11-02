@@ -139,6 +139,7 @@
     margin: 0;
 
     a {
+      font-size: clamp(20px, 1.5vw, 24px);
       color: var(--color-navy-900);
       text-decoration: none;
     }
