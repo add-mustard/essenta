@@ -135,7 +135,7 @@
         <header class="site-header">
             <div class="site-header-inner">
                 <div class="site-brand col-2">
-                    <a href="<?php echo esc_url(home_url('/')); ?>">
+                    <a label="<?php bloginfo('name'); ?>" name="<?php bloginfo('name'); ?>" href="<?php echo esc_url(home_url('/')); ?>">
                         <?php if (has_custom_logo()) {
                             the_custom_logo();
                         } else {
