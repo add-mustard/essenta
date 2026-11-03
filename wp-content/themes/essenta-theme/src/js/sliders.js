@@ -116,6 +116,111 @@ jQuery(function ($) {
     });
   });
 
+  $(".video-testimonials").each(function () {
+    var $block = $(this);
+    var $slider = $block.find(".video-testimonials__videos");
+    var $intro = $block.find(".video-testimonials__intro");
+    var mobileQuery = window.matchMedia("(max-width: 768px)");
+    var animationFrame;
+    var dragging = false;
+    var animating = false;
+    var currentSlide = 0;
+
+    function updateIntro() {
+      var intro = $intro[0].getBoundingClientRect();
+      var covered = false;
+
+      if (!mobileQuery.matches) {
+        $slider.find(".video-testimonials__video").each(function () {
+          var card = this.getBoundingClientRect();
+          if (
+            card.left < intro.right &&
+            card.right > intro.left &&
+            card.top < intro.bottom &&
+            card.bottom > intro.top
+          ) {
+            covered = true;
+          }
+        });
+      }
+
+      $intro.toggleClass("is-covered", covered);
+    }
+
+    // Measure the moving cards during both Slick transitions and live dragging.
+    function monitorOverlap() {
+      window.cancelAnimationFrame(animationFrame);
+      updateIntro();
+      if (dragging || animating) {
+        animationFrame = window.requestAnimationFrame(monitorOverlap);
+      }
+    }
+
+    function settleIntro() {
+      window.cancelAnimationFrame(animationFrame);
+      $intro.toggleClass(
+        "is-covered",
+        !mobileQuery.matches && currentSlide > 0,
+      );
+    }
+
+    $slider.on("init setPosition", function (event, slick) {
+      currentSlide = slick.currentSlide;
+      if (!dragging && !animating) {
+        settleIntro();
+      }
+    });
+    $slider.on("beforeChange", function () {
+      animating = true;
+      monitorOverlap();
+      $slider.find("video").each(function () {
+        this.pause();
+      });
+    });
+    $slider.on("afterChange", function (event, slick, nextSlide) {
+      currentSlide = nextSlide;
+      animating = false;
+      settleIntro();
+    });
+    $slider.on("pointerdown", function () {
+      dragging = true;
+      monitorOverlap();
+    });
+    $(document).on("pointerup pointercancel", function () {
+      dragging = false;
+      if (animating) {
+        monitorOverlap();
+      } else {
+        settleIntro();
+      }
+    });
+    mobileQuery.addEventListener("change", settleIntro);
+
+    $slider.find("video").on("play", function () {
+      var playingVideo = this;
+      $slider.find("video").each(function () {
+        if (this !== playingVideo) {
+          this.pause();
+        }
+      });
+    });
+
+    initialise($slider, {
+      rows: 0,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      variableWidth: true,
+      infinite: false,
+      arrows: true,
+      dots: false,
+      speed: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? 0
+        : 600,
+      prevArrow: $block.find(".video-testimonials__prev"),
+      nextArrow: $block.find(".video-testimonials__next"),
+    });
+  });
+
   $(".insights-block").each(function () {
     var $block = $(this);
     initialise($block.find(".insights-posts-wrapper"), {
