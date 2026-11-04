@@ -12,13 +12,17 @@ function add_theme_scripts()
   $script_ver = filemtime(get_stylesheet_directory() . '/dist/js/scripts.min.js');
   $slick_ver = filemtime(get_stylesheet_directory() . '/dist/js/slick.min.js');
   $sliders_ver = filemtime(get_stylesheet_directory() . '/dist/js/sliders.min.js');
+  $gsap_ver = filemtime(get_stylesheet_directory() . '/dist/js/gsap.min.js');
+  $scrolltrigger_ver = filemtime(get_stylesheet_directory() . '/dist/js/ScrollTrigger.min.js');
 
   // Enqueue style.css with version updating
   wp_enqueue_style('main_style', get_stylesheet_directory_uri() . '/dist/css/style.min.css', array(), $style_ver);
   // Enqueue latest version of jQuery
   wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-latest.min.js', array(), null);
+  wp_enqueue_script('gsap', get_stylesheet_directory_uri() . '/dist/js/gsap.min.js', array(), $gsap_ver, true);
+  wp_enqueue_script('gsap-scrolltrigger', get_stylesheet_directory_uri() . '/dist/js/ScrollTrigger.min.js', array('gsap'), $scrolltrigger_ver, true);
   // Enqueue script.js with version updating and dependency on jQuery
-  wp_enqueue_script('main-script', get_stylesheet_directory_uri() . '/dist/js/scripts.min.js', array('jquery'), $script_ver, true);
+  wp_enqueue_script('main-script', get_stylesheet_directory_uri() . '/dist/js/scripts.min.js', array('jquery', 'gsap', 'gsap-scrolltrigger'), $script_ver, true);
   wp_enqueue_script('main-slick', get_stylesheet_directory_uri() . '/dist/js/slick.min.js', array('jquery'), $slick_ver, true);
   wp_enqueue_script('main-sliders', get_stylesheet_directory_uri() . '/dist/js/sliders.min.js', array('jquery'), $sliders_ver, true);
 }
