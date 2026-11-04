@@ -166,7 +166,10 @@
                                 <div class="mm-topbar">
 
                                     <?php if (has_custom_logo()) : ?>
-                                        <?php the_custom_logo(); ?>
+                                        <?php echo wp_get_attachment_image(get_theme_mod('custom_logo'), 'full', false, array(
+                                            'width'  => 116,
+                                            'height' => 22,
+                                        )); ?>
                                     <?php else : ?>
                                         <span><?php bloginfo('name'); ?></span>
                                     <?php endif; ?>
