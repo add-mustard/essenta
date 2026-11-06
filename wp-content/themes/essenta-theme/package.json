@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "WordPress boilerplate theme",
   "dependencies": {
+    "gsap": "^3.15.0"
   },
   "devDependencies": {
     "gulp": "^5.0.0",

@@ -651,48 +651,86 @@ jQuery(document).ready(function ($) {
   // End of jQuery Ready
 });
 
-// Hero video: clicking the inline video (or play button) opens it in a modal
+/* global gsap, ScrollTrigger */
+// Hero video: GSAP ScrollTrigger expands the inset frame from the first scroll.
 document.addEventListener("DOMContentLoaded", () => {
-  document
-    .querySelectorAll(".homepage-hero-image.has-video")
-    .forEach((hero) => {
-      const modal = document.getElementById(hero.dataset.heroVideoModal);
-      if (!modal) {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const hasGsap = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined";
+
+  if (hasGsap) {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  function cssLengthToPx(value) {
+    const raw = (value || "").trim();
+    const amount = parseFloat(raw);
+    if (!amount) {
+      return 0;
+    }
+    if (raw.endsWith("rem")) {
+      return amount * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    if (raw.endsWith("vh") || raw.endsWith("svh")) {
+      return (amount / 100) * window.innerHeight;
+    }
+    return amount;
+  }
+
+  document.querySelectorAll("[data-hero-video-scroll]").forEach((stage) => {
+    const frame = stage.querySelector(".homepage-hero-image-wrapper");
+    const inlineVideo = stage.querySelector(".homepage-hero-video");
+    if (!frame || reduceMotion.matches || !hasGsap) {
+      return;
+    }
+
+    stage.classList.add("is-active");
+
+    const header = document.querySelector(".site-header");
+    const easeExpand = gsap.parseEase("power3.out");
+
+    function lockVideoBelowHeader() {
+      const offset = header ? Math.ceil(header.getBoundingClientRect().bottom) : 0;
+      stage.style.setProperty("--hero-sticky-top", offset + "px");
+    }
+
+    function syncInlineVideo(progress) {
+      if (!inlineVideo) {
         return;
       }
 
-      const modalVideo = modal.querySelector(
-        ".homepage-hero-video-modal-video",
-      );
+      const stageRect = stage.getBoundingClientRect();
+      const onScreen = stageRect.bottom > 0 && stageRect.top < window.innerHeight;
 
-      function openModal() {
-        modal.classList.add("is-open");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-        modalVideo.currentTime = 0;
-        modalVideo.play().catch(() => {});
+      if (progress > 0.02 && onScreen) {
+        inlineVideo.play().catch(() => {});
+      } else if (progress === 0 || !onScreen) {
+        inlineVideo.pause();
       }
+    }
 
-      function closeModal() {
-        modal.classList.remove("is-open");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
-        modalVideo.pause();
-        modalVideo.currentTime = 0;
-      }
+    function applyMotion(progress) {
+      stage.style.setProperty("--hero-expand", easeExpand(progress).toFixed(4));
+      syncInlineVideo(progress);
+    }
 
-      hero.addEventListener("click", openModal);
-
-      modal.querySelectorAll("[data-hero-video-modal-close]").forEach((el) => {
-        el.addEventListener("click", closeModal);
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && modal.classList.contains("is-open")) {
-          closeModal();
-        }
-      });
+    // Frame growth eases out from the first pixel of scroll.
+    ScrollTrigger.create({
+      trigger: stage,
+      start: 0,
+      end: () => {
+        const stickyTop = cssLengthToPx(getComputedStyle(frame).top);
+        const travel = cssLengthToPx(getComputedStyle(stage).getPropertyValue("--hero-travel"));
+        return Math.max(1, stage.offsetTop - stickyTop + travel);
+      },
+      invalidateOnRefresh: true,
+      onRefreshInit: lockVideoBelowHeader,
+      onUpdate: (self) => {
+        applyMotion(self.progress);
+      },
     });
+
+    applyMotion(0);
+  });
 
   function updateFooterDetails() {
     const details = document.querySelectorAll(".footer-details-wrapper");
