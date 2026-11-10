@@ -1,6 +1,6 @@
 .homepage-hero {
   position: relative;
-  // Visible so the scroll-expand video can stick. Hidden overflow breaks sticky.
+  overflow: hidden;
 
   .homepage-hero-content {
     display: flex;
@@ -42,48 +42,6 @@
     }
   }
 
-  // Scroll runway for the homepage video.
-  // --hero-expand is driven by GSAP ScrollTrigger (0 inset, 1 full width).
-  // --hero-inset: side gap before expansion
-  // --hero-height: starting frame height
-  // --hero-travel: how far the page scrolls while the frame expands
-  // --hero-sticky-top: offset below the sticky header
-  .homepage-hero-video-scroll {
-    --hero-expand: 0;
-    --hero-inset: 140px;
-    --hero-max: 1440px;
-    --hero-height: 552px;
-    --hero-sticky-top: 5.75rem;
-    --hero-travel: 62vh;
-    --hero-radius: 5px;
-    margin-top: 60px;
-
-    &.is-active {
-      height: calc(100svh - var(--hero-sticky-top) - 1.5rem + var(--hero-travel));
-
-      .homepage-hero-image-wrapper.has-video {
-        position: sticky;
-        top: var(--hero-sticky-top);
-        z-index: 1;
-        width: calc(
-          (min(var(--hero-max), 100%) - (var(--hero-inset) * 2)) *
-            (1 - var(--hero-expand)) + 100% * var(--hero-expand)
-        );
-        max-width: none;
-        height: calc(
-          var(--hero-height) +
-            (
-              100svh - var(--hero-sticky-top) - 1.5rem - var(--hero-height)
-            ) * var(--hero-expand)
-        );
-        max-height: none;
-        margin: 0 auto;
-        padding: 0;
-        border-radius: calc(var(--hero-radius) * (1 - var(--hero-expand)));
-      }
-    }
-  }
-
   .homepage-hero-image-wrapper {
     position: relative;
     width: 100%;
@@ -93,15 +51,12 @@
     overflow: hidden;
     border-radius: 5px;
 
+    // Break out of the padded container to fill the full viewport width
     &.has-video {
       max-width: 1440px;
       margin: 60px auto 0;
       padding: 0 140px;
     }
-  }
-
-  .homepage-hero-video-scroll .homepage-hero-image-wrapper.has-video {
-    margin-top: 0;
   }
 
   .homepage-hero-image {
@@ -119,10 +74,46 @@
       height: 100%;
       object-fit: cover;
     }
+
+    video {
+      cursor: pointer;
+    }
   }
 
   .homepage-hero-image.has-video {
     border-radius: 0;
+    cursor: pointer;
+  }
+
+  .homepage-hero-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 70px;
+    height: 70px;
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+
+    cursor: pointer;
+
+    span {
+      font-size: 24px;
+      margin-left: 4px;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.9);
+    }
   }
 
   @media (width <= 980px) {
@@ -142,23 +133,97 @@
       left: 0;
     }
 
-    .homepage-hero-video-scroll {
-      --hero-inset: 20px;
-      --hero-height: 240px;
-      --hero-sticky-top: 4.5rem;
-      --hero-travel: 48vh;
-    }
-
     .homepage-hero-image-wrapper {
       &.has-video {
         padding: 0 20px;
-        max-height: none;
-        height: var(--hero-height, 240px);
+        max-height: 100%;
+        height: 100%;
       }
     }
+  }
+}
 
-    .homepage-hero-video-scroll.is-active .homepage-hero-image-wrapper.has-video {
+.homepage-hero-video-modal {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.8s ease,
+    visibility 0s linear 0.8s;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.8s ease,
+      visibility 0s linear 0s;
+
+    .homepage-hero-video-modal-inner {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.3s;
+    }
+  }
+
+  .homepage-hero-video-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .homepage-hero-video-modal-inner {
+    position: relative;
+    z-index: 1;
+    width: min(90vw, 1200px);
+    max-height: 90vh;
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s ease;
+
+    .homepage-hero-video-modal-video {
+      display: block;
+      width: 100%;
+      max-height: 90vh;
+    }
+
+    .homepage-hero-video-modal-close {
+      position: absolute;
+      top: -2.5rem;
+      right: 0;
+      width: 32px;
+      height: 32px;
       padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+
+      &:before,
+      &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 24px;
+        height: 2px;
+        background: var(--color-sand-200);
+      }
+
+      &:before {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      &:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
     }
   }
 }
