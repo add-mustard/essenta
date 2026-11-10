@@ -28,15 +28,20 @@ $hero_cta_link = get_sub_field('homepage_cta');
     </div>
   </div>
   <?php if ($hero_image && $hero_image['type'] === 'video'): ?>
-    <div class="homepage-hero-video-scroll" data-hero-video-scroll>
-      <div class="homepage-hero-image-wrapper has-video">
-        <div class="homepage-hero-image has-video">
-          <video class="homepage-hero-video" muted loop playsinline preload="metadata" fetchpriority="high" poster="<?php echo esc_url(get_the_post_thumbnail_url($hero_image['ID'], 'full')); ?>">
-            <source
-              src="<?php echo esc_url($hero_image['url']); ?>"
-              type="video/mp4">
-          </video>
-        </div>
+    <div class="homepage-hero-image-wrapper has-video">
+      <div class="homepage-hero-image has-video" data-hero-video-modal="homepage-hero-video-modal">
+        <video class="homepage-hero-video" muted playsinline preload="metadata" fetchpriority="high" poster="<?php echo esc_url(get_the_post_thumbnail_url($hero_image['ID'], 'full')); ?>">
+          <source
+            src="<?php echo esc_url($hero_image['url']); ?>"
+            type="video/mp4">
+        </video>
+
+        <button
+          class="homepage-hero-play"
+          type="button"
+          aria-label="<?php esc_attr_e('Play video', 'essenta-theme'); ?>">
+          <span>▶</span>
+        </button>
       </div>
     </div>
   <?php else: ?>
@@ -52,3 +57,12 @@ $hero_cta_link = get_sub_field('homepage_cta');
   <?php endif; ?>
 
 </div>
+<?php if ($hero_image && $hero_image['type'] === 'video'): ?>
+  <div class="homepage-hero-video-modal" id="homepage-hero-video-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="homepage-hero-video-modal-overlay" data-hero-video-modal-close></div>
+    <div class="homepage-hero-video-modal-inner">
+      <button type="button" class="homepage-hero-video-modal-close" aria-label="<?php esc_attr_e('Close', 'essenta-theme'); ?>" data-hero-video-modal-close></button>
+      <video class="homepage-hero-video-modal-video" src="<?php echo esc_url($hero_image['url']); ?>" controls playsinline preload="none"></video>
+    </div>
+  </div>
+<?php endif; ?>
