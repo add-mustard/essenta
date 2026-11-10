@@ -613,7 +613,7 @@ jQuery(function ($) {
       function (event, slick, currentSlide, nextSlide) {
         $navButtons
           .removeClass("active")
-          .filter('[data-slide-index="' + nextSlide + '"]')
+          .filter("[data-slide-index='" + nextSlide + "']")
           .addClass("active");
       },
     );
@@ -1014,7 +1014,7 @@ jQuery(function ($) {
       if (!mobileQuery.matches) {
         for (let index = 0; index < cards.length; index += 2) {
           jQuery(cards.slice(index, index + 2)).wrapAll(
-            '<div class="sectors-column"></div>',
+            "<div class='sectors-column'></div>",
           );
         }
       }

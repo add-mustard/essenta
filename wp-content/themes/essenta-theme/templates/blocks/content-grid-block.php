@@ -13,6 +13,7 @@ $block_content = get_sub_field('block_intro_content');
 $content_image = get_sub_field('block_image');
 $content_grid_items = get_sub_field('content_grid_items');
 $content_grid_item_count = is_array($content_grid_items) ? count($content_grid_items) : 0;
+$content_grid_link = get_sub_field('content_grid_link');
 
 ?>
 
@@ -43,6 +44,10 @@ $content_grid_item_count = is_array($content_grid_items) ? count($content_grid_i
                             <?php if (! empty($item['grid_item_content'])) : ?>
                                 <p class="content-grid-item-content"><?php echo esc_html($item['grid_item_content']); ?></p>
                             <?php endif; ?>
+                            <?php if (! empty($item['grid_item_link'])) : ?>
+                                <a class="content-grid-item-link btn primary" href="<?php echo esc_url($item['grid_item_link']['url']); ?>"><?php echo esc_html($item['grid_item_link']['title']); ?></a>
+                            <?php endif; ?>
+
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
