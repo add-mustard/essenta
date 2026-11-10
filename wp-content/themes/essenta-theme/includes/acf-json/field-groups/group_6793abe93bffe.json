@@ -2087,6 +2087,25 @@
                                     "append": "",
                                     "admin_only": 0,
                                     "parent_repeater": "field_6aad13fd0d876"
+                                },
+                                {
+                                    "key": "field_6af2f0cc31f77",
+                                    "label": "Grid Item Link",
+                                    "name": "grid_item_link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "allow_in_bindings": 0,
+                                    "admin_only": 0,
+                                    "parent_repeater": "field_6aad13fd0d876"
                                 }
                             ]
                         }
@@ -2926,6 +2945,166 @@
                     "min": "",
                     "max": ""
                 },
+                "layout_6aedc4edb466d": {
+                    "key": "layout_6aedc4edb466d",
+                    "name": "scrolling_grid_content",
+                    "label": "Scrolling Grid Content",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_6aedc4edb466e",
+                            "label": "Scrolling Grid Subheading",
+                            "name": "scrolling_grid_subheading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "admin_only": 0
+                        },
+                        {
+                            "key": "field_6aedc4edb466f",
+                            "label": "Scrolling grid Heading",
+                            "name": "scrolling_grid_heading",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "allow_in_bindings": 0,
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "admin_only": 0
+                        },
+                        {
+                            "key": "field_6aedc4feb4671",
+                            "label": "Scrolling Grid CTA Primary",
+                            "name": "scrolling_grid_cta_primary",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0,
+                            "admin_only": 0
+                        },
+                        {
+                            "key": "field_6aedc514b4672",
+                            "label": "Scrolling Grid CTA Secondary",
+                            "name": "scrolling_grid_cta_secondary",
+                            "aria-label": "",
+                            "type": "link",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "return_format": "array",
+                            "allow_in_bindings": 0,
+                            "admin_only": 0
+                        },
+                        {
+                            "key": "field_6aedc4edb4670",
+                            "label": "Scrolling Grid Contents",
+                            "name": "scrolling_grid_contents",
+                            "aria-label": "",
+                            "type": "repeater",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "layout": "table",
+                            "min": 0,
+                            "max": 0,
+                            "collapsed": "",
+                            "button_label": "Add Row",
+                            "admin_only": 0,
+                            "rows_per_page": 20,
+                            "sub_fields": [
+                                {
+                                    "key": "field_6aedc535b4673",
+                                    "label": "Grid Content card title",
+                                    "name": "grid_content_card_title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "admin_only": 0,
+                                    "parent_repeater": "field_6aedc4edb4670"
+                                },
+                                {
+                                    "key": "field_6aedc54db4674",
+                                    "label": "Grid Content Card text",
+                                    "name": "grid_content_card_text",
+                                    "aria-label": "",
+                                    "type": "wysiwyg",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "allow_in_bindings": 0,
+                                    "tabs": "all",
+                                    "toolbar": "full",
+                                    "media_upload": 1,
+                                    "delay": 0,
+                                    "admin_only": 0,
+                                    "parent_repeater": "field_6aedc4edb4670"
+                                }
+                            ]
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
                 "layout_6ab66e024ed50": {
                     "key": "layout_6ab66e024ed50",
                     "name": "introduction_mini",
@@ -3273,5 +3452,5 @@
     "display_title": "",
     "allow_ai_access": false,
     "ai_description": "",
-    "modified": 1793723808
+    "modified": 1794306328
 }
