@@ -93,7 +93,7 @@ function processImages() {
 // Process and optimize fonts
 function processFonts() {
   return gulp
-    .src(paths.fonts) // Source all font files
+    .src(paths.fonts, { encoding: false }) // Preserve binary font data in Gulp 5
     .pipe(gulp.dest(paths.fontsOutput)); // Copy fonts to output folder
 }
 
