@@ -32,9 +32,11 @@ while ($services_query->have_posts()) {
     $services_query->the_post();
 
     $service_types = get_the_terms(get_the_ID(), 'service_type');
-    $service_type_names = $service_types && !is_wp_error($service_types)
-        ? wp_list_pluck($service_types, 'name')
-        : array('Service');
+    if (!$service_types || is_wp_error($service_types)) {
+        continue;
+    }
+
+    $service_type_names = wp_list_pluck($service_types, 'name');
 
     $services[] = array(
         'title' => get_the_title(),
@@ -46,6 +48,11 @@ while ($services_query->have_posts()) {
 }
 
 wp_reset_postdata();
+
+if (!$services) {
+    return;
+}
+
 $first_service = $services[0];
 
 ?>

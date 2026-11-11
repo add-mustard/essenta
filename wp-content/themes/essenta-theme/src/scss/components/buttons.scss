@@ -242,7 +242,9 @@ button[type="submit"] {
   }
 }
 
-.mega-sub-menu > .mega-menu-item:first-child:not(.nav-cta) > a.mega-menu-link {
+.mega-sub-menu
+  > .mega-menu-item:first-child:not(.nav-cta):not(.no-highlight)
+  > a.mega-menu-link {
   font-family: var(--font-circular-bold) !important;
   font-weight: 700 !important;
 
