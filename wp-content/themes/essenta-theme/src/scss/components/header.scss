@@ -411,7 +411,7 @@
               padding: 16px 0 !important;
             }
 
-            .mm-panel-first-item > a.mega-menu-link {
+            .mm-panel-first-item:not(.no-highlight) > a.mega-menu-link {
               font-family: var(--font-circular-bold) !important;
               font-weight: 700 !important;
 
