@@ -31,7 +31,7 @@ $video_testimonial_videos = get_sub_field('video_testimonials');
             <div class="video-testimonials__videos">
                 <?php foreach ($video_testimonial_videos as $video) : ?>
                     <div class="video-testimonials__video">
-                        <video controls playsinline preload="metadata">
+                        <video controls playsinline preload="metadata" poster="<?php echo esc_url(get_the_post_thumbnail_url($video['ID'], 'full')); ?>">
                             <source src="<?php echo esc_url($video['testimonial_video']['url']); ?>" type="<?php echo esc_attr($video['testimonial_video']['mime_type']); ?>">
                             <?php esc_html_e('Your browser does not support the video tag.', 'essenta-theme'); ?>
                         </video>
