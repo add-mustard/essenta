@@ -34,6 +34,7 @@ attention before loading the theme.
 - **Custom Templates**: Includes templates for pages, blocks, and headers.
 - **ACF Integration**: Uses Advanced Custom Fields Pro for building hero headers and managing page content.
 - **SASS Support**: Modular styling with SASS organized by components and blocks.
+- **Slider Navigation**: Shared Slick dot styles center pagination and hide visible numbers and list markers while retaining accessible slide labels.
 - **Gulp Workflow**: Automated tasks for compiling, minifying, and optimizing styles and scripts.
 - **Organized Structure**: Theme files organized with `src/` for source files and `dist/` for compiled assets.
 - **Custom Post Types**: Theme post types and taxonomies are registered in `functions/cpt.php`.

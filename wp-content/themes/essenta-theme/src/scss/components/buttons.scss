@@ -296,6 +296,43 @@ button[type="submit"] {
 }
 
 // Slick Dots
+.slick-dots {
+  position: relative;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    button {
+      display: block;
+      width: 8px;
+      height: 8px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background-color: #cccccc;
+      font-size: 0;
+      line-height: 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    &.slick-active button {
+      background-color: #555555;
+    }
+  }
+}
+
 .slider-nav,
 .testimonials-block-slider-nav {
   display: flex;
@@ -317,52 +354,9 @@ button[type="submit"] {
   }
 
   .slider-dots {
-    .slick-dots {
-      position: relative !important;
-      top: 0;
-      padding: 0;
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-
-      li {
-        margin: 0 !important;
-        button {
-          width: auto !important;
-          height: auto !important;
-          margin: 0 !important;
-          padding: 0px;
-          background: none;
-          border: none;
-          cursor: pointer;
-
-          .slick-dot-icon {
-            &:before {
-              position: relative !important;
-              content: "" !important;
-              width: 8px;
-              height: 8px;
-              display: block;
-              border-radius: 50%;
-              background-color: #cccccc;
-              transition: background-color 0.3s ease;
-              margin-top: 0 !important;
-            }
-          }
-        }
-
-        &.slick-active {
-          button {
-            .slick-dot-icon {
-              &:before {
-                background-color: #555555;
-              }
-            }
-          }
-        }
-      }
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .slider-arrows {
     display: flex;
